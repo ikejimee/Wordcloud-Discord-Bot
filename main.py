@@ -1,7 +1,7 @@
 import re
 import io
 from wordcloud import WordCloud, STOPWORDS
-from PIL import image 
+#from PIL import Image 
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -24,7 +24,7 @@ URL_REGEX = re.compile(r"https?://\S+")
 MENTION_REGEX = re.compile(r"<@!?\d+>")
 CHANNEL_REGEX = re.compile(r"<#\d+>")
 ROLE_REGEX = re.compile(r"<@&\d+>")
-EMOJI_REGEX = re.compile(r"<a?:\w+\d+>")
+EMOJI_REGEX = re.compile(r"<a?:\w+:\d+>")
 CODEBLOCK_REGEX = re.compile(r"```.*?```", re.DOTALL) # re.DOTALL means the . matches everything including newline characters
 INLINE_CODE_REGEX = re.compile(r"`[^`]+`")
 
@@ -47,7 +47,7 @@ def clean(text: str) -> str:
     text = re.sub(r"\s+", " ", text).strip()
     return text
     
-def tokenize(text: str) -> str:
+def tokenize(text: str) -> list[str]:
     """Turns a string of text into a list of lowercase words
 
     Args:
@@ -57,7 +57,7 @@ def tokenize(text: str) -> str:
         str: _description_
     """
     word_tokens = []
-    for word in re.findall(r"[A-Za-z][A-Zz-a'-]*", text):
+    for word in re.findall(r"[A-Za-z][A-Za-z'-]*", text):
         word_tokens.append(word.lower())
     return word_tokens
 
@@ -121,7 +121,7 @@ async def wordcloud_command(ctx, msgs_per_channel: int = 2000, min_words: int = 
     if not text_chunks:
         return await ctx.reply("I couldn't find any recent messages from you. Socalise more!")
     
-    overall_text = " ".text(text_chunks)
+    overall_text = " ".join(text_chunks)
     words = tokenize(overall_text)
     if len(words) < min_words:
         return await ctx.reply(f"I only found {len(words)} words ... Try !wordcloud with lower parameters!")
